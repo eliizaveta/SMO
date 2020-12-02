@@ -1,0 +1,135 @@
+#include "source.h"
+#include "buffer.h"
+#include "device.h"
+#include "controller.h"
+
+Andreeva_smo::Controller::Controller() {
+
+    this->alpha = 0;
+    this->betta = 0;
+    this->lambda = 0;
+    this->sourcesAmount = 0;
+    this->buffersAmount = 0;
+    this->devicesAmount = 0;
+    this->requestsNumber = 0;
+}
+
+std::list<std::string> Andreeva_smo::Controller::work(Interpreter &interpreter) {
+
+    //общая инициализация
+    interpreter.init(); //инициализация
+    interpreter.config(sourcesAmount, buffersAmount, devicesAmount); //основа пошагового
+
+    std::list<std::string> resultList;
+
+    Andreeva_smo::Source *sources = new Andreeva_smo::Source(lambda, sourcesAmount);
+    Andreeva_smo::Buffer *buffers = new Andreeva_smo::Buffer(buffersAmount);
+    Andreeva_smo::Device *devices = new Andreeva_smo::Device(devicesAmount, alpha, betta);
+
+    float currentTime = 0;
+
+    //основной цикл программы, обработать все заявки
+    for (int i = 0; i < requestsNumber; i++) {
+        Request nextRequest = sources->getNextReq();
+        currentTime += nextRequest.getWaitTime();
+        nextRequest.setWaitTime(currentTime);
+
+        std::list<std::pair<Request, int>> doneRequests = devices->readyDevices(currentTime);
+        if (doneRequests.size() > 0) {
+            for (auto it = doneRequests.begin(); it != doneRequests.end(); ++it) {
+                resultList.push_back("Device №" + std::to_string((*it).second) + " became free in " + std::to_string((*it).first.getWaitTime()));
+                interpreter.deleteRequestFromDevice((*it).first, (*it).second);
+
+                if (!buffers->isEmptyBuffer()) {
+                    std::pair<Request, int> pair2 = buffers->getReq();
+                    Request request2 = pair2.first;
+                    interpreter.getRequestFromBuff(Request((*it).first.getWaitTime(),
+                                                         request2.getSourceNum(),
+                                                         request2.getRequestNum()), pair2.second);
+
+                    int deviceNum2 = devices->addNewReq(std::max(request2.getWaitTime(), (*it).first.getWaitTime()), request2);
+                    resultList.push_back("Request " + std::to_string(request2.getSourceNum()) + "." + std::to_string(request2.getRequestNum())
+                                         + " downloaded in device №" + std::to_string(deviceNum2));
+                    interpreter.addRequestToDevice(Request(std::max(request2.getWaitTime(), (*it).first.getWaitTime()),
+                                                         request2.getSourceNum(),
+                                                         request2.getRequestNum()), (*it).second);
+                }
+            }
+        }
+
+        std::string tmpResStr = "Generated request " + std::to_string(nextRequest.getSourceNum()) + "." + std::to_string(nextRequest.getRequestNum());
+        interpreter.newRequestGenerate(Request(currentTime,
+                                               nextRequest.getSourceNum(),
+                                               nextRequest.getRequestNum()));
+        //прибор занят
+        if (!devices->isFreeDevice()) {
+
+            //в буфере есть место
+            if (buffers->isFreeBuffer()) {
+                int bufferNum = buffers->addNewReq(nextRequest);
+                tmpResStr += " and download in buffer №" + std::to_string(bufferNum + 1);
+                interpreter.addRequestToBuff(Request(currentTime,
+                                                   nextRequest.getSourceNum(),
+                                                   nextRequest.getRequestNum()), bufferNum);
+
+            //в буфере нет места
+            } else {
+
+                std::pair<Request, int> pair4 = buffers->deleteReq();
+                Request deletedRequest = pair4.first;
+                resultList.push_back("Request " + std::to_string(deletedRequest.getSourceNum()) + "."
+                                     + std::to_string(deletedRequest.getRequestNum())
+                                     + " deleted from buffer");
+                interpreter.deleteRequestFromBuff(Request(currentTime,
+                                                        deletedRequest.getSourceNum(),
+                                                        deletedRequest.getRequestNum()), pair4.second);
+                int bufferNum = buffers->addNewReq(nextRequest);
+                tmpResStr += " and denied";
+                interpreter.addRequestToBuff(Request(currentTime,
+                                                   nextRequest.getSourceNum(),
+                                                   nextRequest.getRequestNum()), bufferNum);
+            }
+
+        //прибор свободен
+        } else {
+            int deviceNum = devices->addNewReq(currentTime, nextRequest);
+            tmpResStr += " and download in device №" + std::to_string(deviceNum);
+
+            if (buffers->isFreeBuffer()) {
+                int bufferNum = buffers->addNewReq(nextRequest);
+                interpreter.addRequestToBuff(Request(currentTime,
+                                                   nextRequest.getSourceNum(),
+                                                   nextRequest.getRequestNum()), bufferNum);
+
+                if (!buffers->isEmptyBuffer()) {
+                    std::pair<Request, int> pair3 = buffers->getReq();
+                    Request request2 = pair3.first;
+                    interpreter.getRequestFromBuff(Request(currentTime,
+                                                         request2.getSourceNum(),
+                                                         request2.getRequestNum()), pair3.second);
+                    interpreter.addRequestToDevice(Request(currentTime,
+                                                         nextRequest.getSourceNum(),
+                                                         nextRequest.getRequestNum()), deviceNum);
+                }
+            }
+        }
+        resultList.push_back(tmpResStr);
+    }
+    interpreter.commit(currentTime);
+    return resultList;
+}
+
+void Andreeva_smo::Controller::setAlpha(float value) { alpha = value; }
+
+void Andreeva_smo::Controller::setBetta(float value) { betta = value; }
+
+void Andreeva_smo::Controller::setLambda(float value) { lambda = value; }
+
+void Andreeva_smo::Controller::setDevicesAmount(int value) { devicesAmount = value; }
+
+void Andreeva_smo::Controller::setRequestsNumber(int value) { requestsNumber = value; }
+
+void Andreeva_smo::Controller::setBuffersAmount(int value) { buffersAmount = value; }
+
+void Andreeva_smo::Controller::setSourcesAmount(int value) { sourcesAmount = value; }
+
