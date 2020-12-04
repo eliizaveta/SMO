@@ -5,6 +5,7 @@
 #include <QErrorMessage>
 
 #include "controller.h"
+#include "ui_configure.h"
 
 namespace Ui { class Configure; }
 

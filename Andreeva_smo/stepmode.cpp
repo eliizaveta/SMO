@@ -1,5 +1,4 @@
 #include "stepmode.h"
-#include "ui_stepmode.h"
 
 StepMode::StepMode(QWidget *parent) :
     QWidget(parent),

@@ -6,6 +6,7 @@
 #include "stepmode.h"
 #include "automode.h"
 #include "configure.h"
+#include "ui_mainwindow.h"
 
 namespace Ui { class MainWindow; }
 

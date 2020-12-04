@@ -1,5 +1,3 @@
-#include <map>
-
 #include "interpreter.h"
 
 Andreeva_smo::Interpreter::Interpreter() { }
@@ -242,15 +240,18 @@ void Andreeva_smo::Interpreter::commit(float allWorkTime) {
     std::vector<float> totalTOP; //process
     std::vector<float> totalDevWork;
 
+    //инициализируем массивы всего времени ожидания и работы
     for (int i = 0; i < sourcesAmount; i++) {
         totalTOW.push_back(0);
         totalTOP.push_back(0);
     }
 
+    //время работы приборов
     for (int i = 0; i < devicesAmount; i++) {
         totalDevWork.push_back(0);
     }
 
+    //считаем время работы приборов
     for (auto it = tmpTimeOfDeviceWork.begin(); it != tmpTimeOfDeviceWork.end(); ++it) {
         std::string indexStr = "";
         for (char z: it->first) {
@@ -260,7 +261,7 @@ void Andreeva_smo::Interpreter::commit(float allWorkTime) {
                 indexStr.push_back(z);
             }
         }
-        int index = std::stoi(indexStr);
+        int index = std::stoi(indexStr); //преобр строки в цел число
         std::pair<float, float> pairDevWork = it->second;
         if (pairDevWork.second == 0)
             continue;
@@ -269,6 +270,7 @@ void Andreeva_smo::Interpreter::commit(float allWorkTime) {
                 - std::min(pairDevWork.first, pairDevWork.second);
     }
 
+    //время ожидания
     for (auto it = tmpTimeOfWait.begin(); it != tmpTimeOfWait.end(); ++it) {
         std::string indexStr = "";
         for (char z: it->first) {
@@ -285,7 +287,8 @@ void Andreeva_smo::Interpreter::commit(float allWorkTime) {
         totalTOW.at(index - 1) += std::max(pairTOW.first, pairTOW.second) - std::min(pairTOW.first, pairTOW.second);
     }
 
-    for (auto it = tmpTimeOfWait.begin(); it != tmpTimeOfWait.end(); ++it) {
+    //время процесса
+    for (auto it = tmpTimeOfProcess.begin(); it != tmpTimeOfProcess.end(); ++it) {
         std::string indexStr = "";
         for (char z: it->first) {
             if (z == '.') {
@@ -300,6 +303,7 @@ void Andreeva_smo::Interpreter::commit(float allWorkTime) {
             continue;
         totalTOP.at(index - 1) += std::max(pairTOP.first, pairTOP.second) - std::min(pairTOP.first, pairTOP.second);
     }
+
 
     for (int i =0; i < deviceLoad.size(); i++) {
         deviceLoad.at(i) = (totalDevWork.at(i)/allWorkTime)*100;

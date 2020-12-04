@@ -1,5 +1,4 @@
 #include "configure.h"
-#include "ui_configure.h"
 
 Configure::Configure(QWidget *parent) :
     QWidget(parent),
@@ -34,7 +33,7 @@ void Configure::on_buttonConfigure_clicked() {
         controller.setBuffersAmount(buffers);
         controller.setDevicesAmount(devices);
         controller.setRequestsNumber(requests);
-        controller.modulateWork(*interpreter);
+        controller.work(*interpreter);
     }
 }
 

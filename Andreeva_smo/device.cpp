@@ -46,7 +46,7 @@ int Andreeva_smo::Device::addNewReq(float currentTime, Andreeva_smo::Request req
     return -1;
 }
 
-std::list<std::pair<Andreeva_smo::Request, int> > Andreeva_smo::Device::readyDevices(float currentTime) {
+std::list<std::pair<Andreeva_smo::Request, int>> Andreeva_smo::Device::readyDevices(float currentTime) {
 
     std::list<std::pair<Request, int>> tmpList;
     std::vector<std::pair<float, Request> *> tmpDev;

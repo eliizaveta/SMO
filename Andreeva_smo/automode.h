@@ -4,6 +4,7 @@
 #include <QWidget>
 
 #include "interpreter.h"
+#include "ui_automode.h"
 
 namespace Ui { class AutoMode; }
 

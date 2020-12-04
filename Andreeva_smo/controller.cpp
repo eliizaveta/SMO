@@ -1,6 +1,3 @@
-#include "source.h"
-#include "buffer.h"
-#include "device.h"
 #include "controller.h"
 
 Andreeva_smo::Controller::Controller() {
@@ -17,8 +14,8 @@ Andreeva_smo::Controller::Controller() {
 std::list<std::string> Andreeva_smo::Controller::work(Interpreter &interpreter) {
 
     //общая инициализация
-    interpreter.init(); //инициализация
-    interpreter.config(sourcesAmount, buffersAmount, devicesAmount); //основа пошагового
+    interpreter.init(); //чистим все предыдущ получ данные
+    interpreter.config(sourcesAmount, buffersAmount, devicesAmount); //обнуляем массивы
 
     std::list<std::string> resultList;
 
@@ -35,11 +32,13 @@ std::list<std::string> Andreeva_smo::Controller::work(Interpreter &interpreter) 
         nextRequest.setWaitTime(currentTime);
 
         std::list<std::pair<Request, int>> doneRequests = devices->readyDevices(currentTime);
+
         if (doneRequests.size() > 0) {
             for (auto it = doneRequests.begin(); it != doneRequests.end(); ++it) {
                 resultList.push_back("Device №" + std::to_string((*it).second) + " became free in " + std::to_string((*it).first.getWaitTime()));
                 interpreter.deleteRequestFromDevice((*it).first, (*it).second);
 
+                //берем из буфера и передаем на девайс
                 if (!buffers->isEmptyBuffer()) {
                     std::pair<Request, int> pair2 = buffers->getReq();
                     Request request2 = pair2.first;

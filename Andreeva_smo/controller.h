@@ -4,6 +4,9 @@
 #include <list>
 #include <string>
 
+#include "source.h"
+#include "buffer.h"
+#include "device.h"
 #include "interpreter.h"
 
 namespace Andreeva_smo {

@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include <interpreter.h>
+#include "ui_stepmode.h"
 
 namespace Ui { class StepMode; }
 

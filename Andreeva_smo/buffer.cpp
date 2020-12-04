@@ -84,7 +84,7 @@ std::pair<Andreeva_smo::Request, int> Andreeva_smo::Buffer::getReq() {
 
          //FIFO
          if (buffers.at(i)->getWaitTime() < buffers.at(reqToGet)->getWaitTime())
-             continue;
+             reqToGet = i;
 
          else if (buffers.at(i)->getWaitTime() == buffers.at(reqToGet)->getWaitTime()) {
             if (buffers.at(i)->getSourceNum() < buffers.at(reqToGet)->getSourceNum()) {
@@ -94,8 +94,7 @@ std::pair<Andreeva_smo::Request, int> Andreeva_smo::Buffer::getReq() {
                         reqToGet = i;
                     }
                 }
-            } else
-             reqToGet = i;
+            }
         }
 
         if (!selected) {

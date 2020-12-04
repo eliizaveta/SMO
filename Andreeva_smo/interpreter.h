@@ -2,6 +2,7 @@
 #define ANALYTICS_H
 
 #include <set>
+#include <map>
 #include <vector>
 #include <string>
 

@@ -1,5 +1,4 @@
 #include "automode.h"
-#include "ui_automode.h"
 
 AutoMode::AutoMode(QWidget *parent) :
     QWidget(parent),
@@ -13,9 +12,9 @@ void AutoMode::setInterp(Andreeva_smo::Interpreter *value) { interpreter = value
 
 void AutoMode::interpretation() {
 
-    const int columnAmountSrc = 8;
+    const int columnAmount = 8;
     ui->tableSources->setRowCount(interpreter->getProcessedReq().size());
-    ui->tableSources->setColumnCount(columnAmountSrc);
+    ui->tableSources->setColumnCount(columnAmount);
 
     ui->tableSources->setHorizontalHeaderLabels(QStringList() << "Successed"<< "Denied"<< "TIS"<< "TOW"<< "TOP"<< "Disp. TOW"<< "Disp. TOP"<< "Pr. Failure");
 
@@ -35,8 +34,7 @@ void AutoMode::interpretation() {
     const int columnAmountDev = 1;
     ui->tableDevices->setRowCount(interpreter->getDeviceLoad().size());
     ui->tableDevices->setColumnCount(columnAmountDev);
-
-    ui->tableDevices->setHorizontalHeaderLabels(QStringList() << "Coefficient");
+    ui->tableDevices->setHorizontalHeaderLabels(QStringList() << "Workload");
 
     for (int i=0; i < ui->tableDevices->rowCount(); i++) {
         ui->tableDevices->setVerticalHeaderItem(i, new QTableWidgetItem(("Device " + std::to_string(i+1)).c_str()));
