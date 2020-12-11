@@ -90,6 +90,9 @@ void StepMode::on_buttonNext_clicked() {
             ui->tableDevices->setItem(i, 0, new QTableWidgetItem(free.c_str()));
             ui->tableDevices->setItem(i, 1, new QTableWidgetItem("-"));
         } else {
+            ui->tableDevices->setItem(i, 0, new QTableWidgetItem(free.c_str()));
+            ui->tableDevices->setItem(i, 1, new QTableWidgetItem("-"));
+            QThread::msleep(10);
             ui->tableDevices->setItem(i, 0, new QTableWidgetItem(busy.c_str()));
             ui->tableDevices->setItem(i, 1, new QTableWidgetItem(stepModel.devices.at(i).c_str()));
         }
@@ -116,7 +119,7 @@ void StepMode::on_buttonBack_clicked() {
     ui->textTime->setText(std::to_string(stepModel.currentTime).c_str());
     ui->textStep->setText(std::to_string(currentStep).c_str());
 
-    for (int i=0; i < ui->tableBuffers->rowCount(); i++) {
+    for (int i = 0; i < ui->tableBuffers->rowCount(); i++) {
         if (stepModel.buffers.at(i) == stepModel.EMPTY) {
             ui->tableBuffers->setItem(i, 0, new QTableWidgetItem(free.c_str()));
             ui->tableBuffers->setItem(i, 1, new QTableWidgetItem("-"));
@@ -126,7 +129,7 @@ void StepMode::on_buttonBack_clicked() {
         }
     }
 
-    for (int i=0; i < ui->tableDevices->rowCount(); i++) {
+    for (int i = 0; i < ui->tableDevices->rowCount(); i++) {
         if (stepModel.devices.at(i) == stepModel.EMPTY) {
             ui->tableDevices->setItem(i, 0, new QTableWidgetItem(free.c_str()));
             ui->tableDevices->setItem(i, 1, new QTableWidgetItem("-"));

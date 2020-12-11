@@ -2,7 +2,9 @@
 #define STEPMODE_H
 
 #include <QWidget>
+#include <QThread>
 #include <interpreter.h>
+
 #include "ui_stepmode.h"
 
 namespace Ui { class StepMode; }
